@@ -50,7 +50,7 @@ public class WDispatchServlet extends HttpServlet {
     private void doDispatch(HttpServletRequest req, HttpServletResponse resp) throws Exception{
         String url = req.getRequestURI();
         String contextPath = req.getContextPath();
-        url = url.replaceAll(contextPath, "").replaceAll("/", "/");
+        url = url.replaceAll(contextPath, "").replaceAll("/+", "/");
         if(!handlerMapping.containsKey(url)){
             resp.getWriter().write("404 Not Found, by Watson");
             return;
@@ -104,7 +104,7 @@ public class WDispatchServlet extends HttpServlet {
                 if(!file.getName().endsWith(".class")){
                     continue;
                 }
-                String className = scanPackage+"."+file.getName().replace(".class","");
+                String className = (scanPackage+"."+file.getName()).replace(".class","");
                 this.classNames.add(className);
             }
         }
@@ -139,8 +139,6 @@ public class WDispatchServlet extends HttpServlet {
                         }
                         ioc.put(i.getName(), instance);
                     }
-
-
                 }else{
                     continue;
                 }
@@ -189,7 +187,7 @@ public class WDispatchServlet extends HttpServlet {
             for (Method method : clazz.getMethods()) {
                 if(!method.isAnnotationPresent(WRequestMapping.class)){continue;}
                 WRequestMapping requestMapping = method.getAnnotation(WRequestMapping.class);
-                String url = (baseUrl+"/"+requestMapping.value()).replaceAll("/","/");
+                String url = (baseUrl+"/"+requestMapping.value()).replaceAll("/+","/");
                 handlerMapping.put(url, method);
                 System.out.println("Mapped:"+url+","+method);
             }
